@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ResumeAI — Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --card: #f1f5f9;
+      --border: rgba(148, 163, 184, 0.2);
+      --accent: #10b981;
+      --accent2: #3b82f6;
+      --text: #0f172a;
+      --muted: #64748b;
+      --error: #ef4444;
+      --success: #10b981;
+      --input-bg: #ffffff;
+      --shadow: rgba(15, 23, 42, 0.08);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── LEFT PANEL ── */
+    .left-panel {
+      width: 48%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 64px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 100%);
+    }
+
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 40%, rgba(16,185,129,0.15) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 80%, rgba(59,130,246,0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(16,185,129,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16,185,129,0.08) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 64px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 12px rgba(16,185,129,0.25);
+    }
+
+    .logo-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+
+    .logo-text span { color: var(--accent); }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.3);
+      color: #047857;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+
+    .badge::before { content: '●'; font-size: 8px; animation: blink 1.5s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .hero-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 3.2rem;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    .hero-title .highlight {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      max-width: 380px;
+      margin-bottom: 48px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 32px;
+      position: relative; z-index: 1;
+    }
+
+    .stat { }
+    .stat-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .stat-label { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+    .floating-card {
+      position: absolute;
+      bottom: 80px; right: -20px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      display: flex; align-items: center; gap: 12px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+      animation: float 4s ease-in-out infinite;
+      z-index: 2;
+    }
+    @keyframes float {
+      0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)}
+    }
+    .fc-icon { font-size: 24px; }
+    .fc-label { font-size: 0.75rem; color: var(--muted); }
+    .fc-value { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--text); }
+
+    /* ── RIGHT PANEL ── */
+    .right-panel {
+      flex: 1;
+      background: var(--panel);
+      border-left: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      position: relative;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      animation: slideUp 0.5s ease both;
+    }
+    @keyframes slideUp {
+      from { opacity:0; transform:translateY(24px) }
+      to { opacity:1; transform:translateY(0) }
+    }
+
+    .tab-switcher {
+      display: flex;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 32px;
+    }
+
+    .tab-btn {
+      flex: 1; padding: 10px;
+      border: none; background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem; font-weight: 500;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(59,130,246,0.1));
+      color: var(--text);
+      box-shadow: 0 2px 8px rgba(16,185,129,0.15);
+    }
+
+    .form-section { display: none; }
+    .form-section.active { display: block; }
+
+    .form-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem; font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+    .form-subtitle { color: var(--muted); font-size: 0.88rem; margin-bottom: 28px; }
+
+    .form-group { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #475569;
+      margin-bottom: 7px;
+      letter-spacing: 0.3px;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex; align-items: center;
+    }
+
+    .input-icon {
+      position: absolute; left: 14px;
+      color: var(--muted); font-size: 16px;
+      pointer-events: none;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 14px 12px 42px;
+      background: var(--input-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+    }
+
+    input.error-input { border-color: var(--error); }
+
+    .toggle-pw {
+      position: absolute; right: 14px;
+      background: none; border: none;
+      color: var(--muted); cursor: pointer;
+      font-size: 15px; padding: 0;
+      transition: color 0.2s;
+    }
+    .toggle-pw:hover { color: var(--text); }
+
+    .error-msg {
+      font-size: 0.78rem;
+      color: var(--error);
+      margin-top: 5px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    .forgot {
+      text-align: right;
+      margin-top: -10px;
+      margin-bottom: 18px;
+    }
+    .forgot a {
+      font-size: 0.8rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      transition: opacity 0.2s;
+    }
+    .forgot a:hover { opacity: 0.8; }
+
+    .strength-bar {
+      height: 3px;
+      border-radius: 2px;
+      background: #e2e8f0;
+      margin-top: 8px;
+      overflow: hidden;
+      display: none;
+    }
+    .strength-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s, background 0.3s;
+      width: 0%;
+    }
+    .strength-label { font-size: 0.72rem; color: var(--muted); margin-top: 4px; display: none; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, var(--accent), #059669);
+      border: none;
+      border-radius: 10px;
+      color: #ffffff;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+      margin-top: 6px;
+      box-shadow: 0 4px 12px rgba(16,185,129,0.25);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(16,185,129,0.35);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary.loading { pointer-events: none; opacity: 0.8; }
+
+    .btn-primary .spinner {
+      display: none;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-primary.loading .btn-label { display: none; }
+    .btn-primary.loading .spinner { display: block; }
+
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 22px 0;
+      color: var(--muted); font-size: 0.8rem;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1;
+      height: 1px; background: var(--border);
+    }
+
+    .social-btns { display: flex; }
+    .btn-social {
+      flex: 1; padding: 11px 16px;
+      background: var(--input-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    .btn-social:hover {
+      border-color: #4285F4;
+      background: #f8faff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(66,133,244,0.15);
+    }
+    .btn-social:active { transform: translateY(0); }
+    .btn-social img { width: 20px; height: 20px; }
+    .btn-social .google-loading {
+      display: none; width: 18px; height: 18px;
+      border: 2px solid #e0e0e0; border-top-color: #4285F4;
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    .btn-social.loading .google-loading { display: block; }
+    .btn-social.loading img { display: none; }
+    .btn-social.loading span { color: var(--muted); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast {
+      position: fixed; top: 24px; right: 24px;
+      background: var(--panel);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 12px;
+      font-size: 0.9rem;
+      transform: translateX(120%);
+      transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+      z-index: 100;
+      min-width: 280px;
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+    .toast.show { transform: translateX(0); }
+    .toast.success { 
+      border-color: rgba(16,185,129,0.4);
+      background: linear-gradient(135deg, #f0fdf4, #ffffff);
+    }
+    .toast.error-t { 
+      border-color: rgba(239,68,68,0.4);
+      background: linear-gradient(135deg, #fef2f2, #ffffff);
+    }
+    .toast-icon { font-size: 20px; }
+    .toast-msg { flex: 1; }
+    .toast-title { font-weight: 600; font-size: 0.88rem; color: var(--text); }
+    .toast-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+    .terms {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 16px;
+      line-height: 1.6;
+    }
+    .terms a { color: var(--accent); text-decoration: none; font-weight: 500; }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width: 768px) {
+      .left-panel { display: none; }
+      .right-panel { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="grid-bg"></div>
+    <div class="logo">
+      <div class="logo-icon">📄</div>
+      <div class="logo-text">Resume<span>AI</span></div>
+    </div>
+    <div class="hero-content">
+      <div class="badge">AI-Powered Platform</div>
+      <h1 class="hero-title">
+        Land Your<br/>
+        Dream Job<br/>
+        <span class="highlight">Faster.</span>
+      </h1>
+      <p class="hero-desc">
+        Build professional resumes, get AI-powered feedback, and practice with personalized interview questions — all in one place.
+      </p>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value">98%</div>
+          <div class="stat-label">ATS Pass Rate</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">10k+</div>
+          <div class="stat-label">Resumes Analyzed</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value">3x</div>
+          <div class="stat-label">More Interviews</div>
+        </div>
+      </div>
+    </div>
+    <div class="floating-card">
+      <div class="fc-icon">🎯</div>
+      <div>
+        <div class="fc-label"> ATS Score</div>
+        <div class="fc-value">87 / 100 — Strong</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="auth-card">
+
+      <!-- Tab Switcher -->
+      <div class="tab-switcher">
+        <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+        <button class="tab-btn" onclick="switchTab('register')">Create Account</button>
+      </div>
+
+      <!-- ── LOGIN FORM ── -->
+      <div class="form-section active" id="login-section">
+        <div class="form-title">Welcome back 👋</div>
+        <div class="form-subtitle">Sign in to continue to your dashboard</div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉</span>
+            <input type="email" id="login-email" placeholder="you@example.com" oninput="clearErr('login-email-err')"/>
+          </div>
+          <div class="error-msg" id="login-email-err">Please enter a valid email.</div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="login-password" placeholder="Enter your password" oninput="clearErr('login-pw-err')"/>
+            <button class="toggle-pw" onclick="togglePw('login-password', this)">👁</button>
+          </div>
+          <div class="error-msg" id="login-pw-err">Password must be at least 6 characters.</div>
+        </div>
+
+        <div class="forgot"><a href="#">Forgot password?</a></div>
+
+        <button class="btn-primary" id="login-btn" onclick="handleLogin()">
+          <span class="btn-label">Sign In →</span>
+          <div class="spinner"></div>
+        </button>
+
+      </div>
+
+      <!-- ── REGISTER FORM ── -->
+      <div class="form-section" id="register-section">
+        <div class="form-title">Get started free 🚀</div>
+        <div class="form-subtitle">Create your account in seconds</div>
+
+        <div class="form-group">
+          <label>Full Name</label>
+          <div class="input-wrap">
+            <span class="input-icon">👤</span>
+            <input type="text" id="reg-name" placeholder="John Doe" oninput="clearErr('reg-name-err')"/>
+          </div>
+          <div class="error-msg" id="reg-name-err">Please enter your full name.</div>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <span class="input-icon">✉</span>
+            <input type="email" id="reg-email" placeholder="you@example.com" oninput="clearErr('reg-email-err')"/>
+          </div>
+          <div class="error-msg" id="reg-email-err">Please enter a valid email.</div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="reg-password" placeholder="Create a strong password"
+              oninput="checkStrength(this.value); clearErr('reg-pw-err')"/>
+            <button class="toggle-pw" onclick="togglePw('reg-password', this)">👁</button>
+          </div>
+          <div class="strength-bar" id="strength-bar">
+            <div class="strength-fill" id="strength-fill"></div>
+          </div>
+          <div class="strength-label" id="strength-label"></div>
+          <div class="error-msg" id="reg-pw-err">Password must be at least 8 characters.</div>
+        </div>
+
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="reg-confirm" placeholder="Re-enter your password" oninput="clearErr('reg-confirm-err')"/>
+          </div>
+          <div class="error-msg" id="reg-confirm-err">Passwords do not match.</div>
+        </div>
+
+        <button class="btn-primary" id="reg-btn" onclick="handleRegister()">
+          <span class="btn-label">Create Account →</span>
+          <div class="spinner"></div>
+        </button>
+
+        <p class="terms">
+          By registering, you agree to our
+          <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <span class="toast-icon" id="toast-icon"></span>
+    <div class="toast-msg">
+      <div class="toast-title" id="toast-title"></div>
+      <div class="toast-sub" id="toast-sub"></div>
+    </div>
+  </div>
+
+  <script>
+    // ══════════════════════════════════════════════════════════════
+    // ══════════════════════════════════════════════════════════════
+    // USER STORAGE — registered users kept in localStorage (permanent)
+    // SESSION     — login state kept in sessionStorage (clears on tab/browser close)
+    // SESSION EXPIRY — even if sessionStorage survives, expires after 8 hours
+    // ══════════════════════════════════════════════════════════════
+
+    const SESSION_DURATION_MS = 8 * 60 * 60 * 1000; // 8 hours
+
+    // ── Password hashing (one-way, cannot be reversed) ──
+    async function hashPassword(password) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password + 'resumeai_salt_2024');
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // ── Registered users: stored permanently in localStorage ──
+    function getUsers() {
+      try { return JSON.parse(localStorage.getItem('resumeai_users') || '[]'); }
+      catch { return []; }
+    }
+    function saveUsers(users) {
+      localStorage.setItem('resumeai_users', JSON.stringify(users));
+    }
+
+    // ── Session: stored in sessionStorage (auto-clears on browser/tab close) ──
+    function saveSession(user) {
+      const session = {
+        name: user.name,
+        email: user.email,
+        loginTime: Date.now()
+      };
+      sessionStorage.setItem('resumeai_session', JSON.stringify(session));
+      sessionStorage.setItem('resumeai_loggedin', 'true');
+      // Keep localStorage in sync for pages that check it
+      localStorage.setItem('resumeai_loggedin', 'true');
+      localStorage.setItem('resumeai_current_user', JSON.stringify({ name: user.name, email: user.email }));
+    }
+
+    function clearSession() {
+      sessionStorage.removeItem('resumeai_session');
+      sessionStorage.removeItem('resumeai_loggedin');
+      localStorage.removeItem('resumeai_loggedin');
+      localStorage.removeItem('resumeai_current_user');
+    }
+
+    function isLoggedIn() {
+      // Check sessionStorage first (primary)
+      if (sessionStorage.getItem('resumeai_loggedin') !== 'true') {
+        clearSession(); // clean up stale localStorage too
+        return false;
+      }
+      // Check session expiry
+      try {
+        const session = JSON.parse(sessionStorage.getItem('resumeai_session') || '{}');
+        if (!session.loginTime || (Date.now() - session.loginTime) > SESSION_DURATION_MS) {
+          clearSession();
+          return false;
+        }
+      } catch { clearSession(); return false; }
+      return true;
+    }
+
+    // ── If already logged in with valid session, go straight to dashboard ──
+    if (isLoggedIn()) {
+      window.location.href = 'dashboard.html';
+    }
+
+    // ── TAB SWITCHER ──
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach((b,i) =>
+        b.classList.toggle('active', (tab==='login' && i===0)||(tab==='register' && i===1)));
+      document.getElementById('login-section').classList.toggle('active', tab==='login');
+      document.getElementById('register-section').classList.toggle('active', tab==='register');
+    }
+
+    // ── TOGGLE PASSWORD VISIBILITY ──
+    function togglePw(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      const show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      btn.textContent = show ? '🙈' : '👁';
+    }
+
+    // ── PASSWORD STRENGTH ──
+    function checkStrength(val) {
+      const bar = document.getElementById('strength-bar');
+      const fill = document.getElementById('strength-fill');
+      const label = document.getElementById('strength-label');
+      bar.style.display = 'block'; label.style.display = 'block';
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      const levels = [
+        { w: '25%', c: '#ef4444', t: 'Weak' },
+        { w: '50%', c: '#f97316', t: 'Fair' },
+        { w: '75%', c: '#eab308', t: 'Good' },
+        { w: '100%',c: '#10b981', t: 'Strong' },
+      ];
+      const l = levels[score - 1] || levels[0];
+      fill.style.width = val ? l.w : '0%';
+      fill.style.background = l.c;
+      label.textContent = val ? `Strength: ${l.t}` : '';
+      label.style.color = l.c;
+    }
+
+    // ── CLEAR ERROR ──
+    function clearErr(id) {
+      const el = document.getElementById(id);
+      if (el) { el.classList.remove('show'); }
+      const inp = el.previousElementSibling?.querySelector('input') ||
+                  document.getElementById(id.replace('-err','').replace('reg-','reg-').replace('login-','login-'));
+      if (inp) inp.classList.remove('error-input');
+    }
+
+    function showErr(errId, inputId) {
+      document.getElementById(errId).classList.add('show');
+      const inp = document.getElementById(inputId);
+      if (inp) inp.classList.add('error-input');
+    }
+
+    // ── TOAST ──
+    function showToast(type, title, sub) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-icon').textContent = type === 'success' ? '✅' : '❌';
+      document.getElementById('toast-title').textContent = title;
+      document.getElementById('toast-sub').textContent = sub;
+      toast.className = 'toast ' + type + (type === 'error' ? '-t' : '');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    // ── VALIDATION HELPERS ──
+    function validateEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    // ── LOGIN HANDLER ──
+    async function handleLogin() {
+      const email    = document.getElementById('login-email').value.trim().toLowerCase();
+      const password = document.getElementById('login-password').value;
+      const btn      = document.getElementById('login-btn');
+
+      let hasError = false;
+      if (!email || !validateEmail(email))       { showErr('login-email-err', 'login-email'); hasError = true; }
+      if (!password || password.length < 6)      { showErr('login-pw-err', 'login-password'); hasError = true; }
+      if (hasError) return;
+
+      btn.classList.add('loading');
+
+      setTimeout(async () => {
+        btn.classList.remove('loading');
+
+        const users = getUsers();
+        const user  = users.find(u => u.email === email);
+
+        if (!user) {
+          showToast('error', 'Login Failed', 'No account found with this email. Please register first.');
+          return;
+        }
+
+        // Hash the entered password and compare with stored hash
+        const enteredHash = await hashPassword(password);
+        if (enteredHash !== user.passwordHash) {
+          showToast('error', 'Login Failed', 'Incorrect password. Please try again.');
+          return;
+        }
+
+        // Update last login timestamp
+        user.lastLogin = new Date().toISOString();
+        saveUsers(users);
+
+        // Save session (sessionStorage — auto-clears on browser close)
+        saveSession(user);
+
+        showToast('success', `Welcome back, ${user.name}! 👋`, 'Redirecting to your dashboard...');
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+      }, 1000);
+    }
+
+    // ── REGISTER HANDLER ──
+    async function handleRegister() {
+      const name     = document.getElementById('reg-name').value.trim();
+      const email    = document.getElementById('reg-email').value.trim().toLowerCase();
+      const password = document.getElementById('reg-password').value;
+      const confirm  = document.getElementById('reg-confirm').value;
+      const btn      = document.getElementById('reg-btn');
+
+      let hasError = false;
+      if (!name || name.length < 2)              { showErr('reg-name-err', 'reg-name'); hasError = true; }
+      if (!email || !validateEmail(email))       { showErr('reg-email-err', 'reg-email'); hasError = true; }
+      if (!password || password.length < 8)      { showErr('reg-pw-err', 'reg-password'); hasError = true; }
+      if (password !== confirm)                  { showErr('reg-confirm-err', 'reg-confirm'); hasError = true; }
+      if (hasError) return;
+
+      btn.classList.add('loading');
+
+      setTimeout(async () => {
+        btn.classList.remove('loading');
+
+        const users = getUsers();
+
+        if (users.find(u => u.email === email)) {
+          showToast('error', 'Email Already Registered', 'Please sign in or use a different email.');
+          return;
+        }
+
+        // Hash password before storing (one-way — cannot be reversed)
+        const passwordHash = await hashPassword(password);
+
+        const newUser = {
+          name,
+          email,
+          passwordHash,          // store hash only, never plain text
+          createdAt: new Date().toISOString(),
+          lastLogin: new Date().toISOString()
+        };
+
+        users.push(newUser);
+        saveUsers(users);
+
+        showToast('success', `Account created, ${name}! 🎉`, 'You can now sign in with your credentials.');
+
+        // Clear register fields
+        document.getElementById('reg-name').value     = '';
+        document.getElementById('reg-email').value    = '';
+        document.getElementById('reg-password').value = '';
+        document.getElementById('reg-confirm').value  = '';
+
+        // Switch to sign-in tab and pre-fill email
+        setTimeout(() => {
+          switchTab('login');
+          document.getElementById('login-email').value = email;
+          document.getElementById('login-password').focus();
+        }, 1800);
+      }, 1000);
+    }
+
+    // ── Allow Enter key to submit ──
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        const loginActive = document.getElementById('login-section').classList.contains('active');
+        if (loginActive) handleLogin(); else handleRegister();
+      }
+    });
+  </script>
+
+</body>
+</html>
