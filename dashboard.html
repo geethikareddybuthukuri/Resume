@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ResumeAI — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --card: #f1f5f9;
+      --border: rgba(148,163,184,0.25);
+      --accent: #10b981;
+      --accent2: #3b82f6;
+      --accent3: #6366f1;
+      --text: #0f172a;
+      --muted: #64748b;
+      --light: #94a3b8;
+      --shadow: 0 4px 24px rgba(15,23,42,0.08);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+      padding: 16px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--accent), #b54a23);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(201,87,42,0.3);
+    }
+
+    .logo-text {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text span { color: #7ecba1; }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .user-profile:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #7ecba1, #4fffb0);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--accent2);
+    }
+
+    .user-name {
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .btn-logout {
+      padding: 8px 18px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* ── HERO SECTION ── */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+      color: white;
+      padding: 60px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(126,203,161,0.15), transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(201,87,42,0.1), transparent 50%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .welcome-tag {
+      display: inline-block;
+      background: rgba(126,203,161,0.2);
+      border: 1px solid rgba(126,203,161,0.3);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      color: #7ecba1;
+    }
+
+    .hero-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+    }
+
+    .hero-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      line-height: 1.6;
+      max-width: 600px;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .main-content {
+      max-width: 1200px;
+      margin: -40px auto 60px;
+      padding: 0 40px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      margin-bottom: 32px;
+      letter-spacing: -0.5px;
+    }
+
+    /* ── FEATURE CARDS ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 28px;
+      margin-bottom: 50px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), #b54a23);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s;
+    }
+
+    .feature-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      border-color: var(--accent);
+    }
+
+    .feature-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+    }
+
+    .feature-card:hover .feature-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .feature-card.builder .feature-icon {
+      background: linear-gradient(135deg, rgba(201,87,42,0.1), rgba(201,87,42,0.2));
+      color: var(--accent);
+    }
+
+    .feature-card.analyzer .feature-icon {
+      background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(59,130,246,0.2));
+      color: var(--accent3);
+    }
+
+    .feature-card.interview .feature-icon {
+      background: linear-gradient(135deg, rgba(26,58,46,0.1), rgba(45,106,79,0.2));
+      color: var(--accent2);
+    }
+
+    .feature-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .feature-desc {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .feature-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .feature-tag {
+      padding: 4px 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .feature-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 22px;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: 0.1px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .feature-cta::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.18);
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+
+    .feature-cta:hover::before { opacity: 1; }
+
+    .feature-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(0,0,0,0.22);
+    }
+
+    .feature-cta:active { transform: translateY(0); }
+
+    .feature-cta .cta-arrow {
+      transition: transform 0.3s;
+      font-style: normal;
+    }
+
+    .feature-cta:hover .cta-arrow {
+      transform: translateX(4px);
+    }
+
+    .feature-card.builder .feature-cta {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(16,185,129,0.4);
+    }
+
+    .feature-card.analyzer .feature-cta {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(59,130,246,0.4);
+    }
+
+    .feature-card.interview .feature-cta {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(99,102,241,0.4);
+    }
+
+    /* ── STATS SECTION ── */
+    .stats-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      margin-bottom: 50px;
+      box-shadow: var(--shadow);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 32px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      text-align: center;
+      margin-top: 60px;
+    }
+
+    .footer-text {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    .footer-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+
+    .footer-link:hover {
+      color: var(--accent);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .topbar {
+        padding: 14px 20px;
+      }
+      .hero {
+        padding: 40px 20px;
+      }
+      .hero-title {
+        font-size: 2rem;
+      }
+      .main-content {
+        padding: 0 20px;
+        margin-top: -20px;
+      }
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s;
+      z-index: 1000;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast-icon { font-size: 20px; }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-icon">📄</div>
+      <div class="logo-text">Resume<span>AI</span></div>
+    </div>
+    <div class="topbar-actions">
+      <div class="user-profile">
+        <div class="user-avatar">U</div>
+        <div class="user-name">User</div>
+      </div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- HERO SECTION -->
+  <div class="hero">
+    <div class="hero-content">
+      <div class="welcome-tag">👋 Welcome Back</div>
+      <h1 class="hero-title"> AI-Powered Career Hub</h1>
+      <p class="hero-subtitle">Build professional resumes, analyze your content with AI, and ace your interviews — all in one place.</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- FEATURE CARDS -->
+    <div class="features-grid">
+      
+      <!-- Resume Builder -->
+      <div class="feature-card builder" onclick="openResumeBuilder()">
+        <div class="feature-icon">📝</div>
+        <h3 class="feature-title">Resume Builder</h3>
+        <p class="feature-desc">Create professional, ATS-friendly resumes with our easy-to-use builder and 10 stunning templates.</p>
+        <div class="feature-tags">
+          <span class="feature-tag">10 Templates</span>
+          <span class="feature-tag">ATS-Optimized</span>
+          <span class="feature-tag">Live Preview</span>
+        </div>
+        <button class="feature-cta" onclick="openResumeBuilder()">
+          📝 Start Building <i class="cta-arrow">→</i>
+        </button>
+      </div>
+
+      <!-- Resume Analyzer -->
+      <div class="feature-card analyzer" onclick="openResumeAnalyzer()">
+        <div class="feature-icon">🔍</div>
+        <h3 class="feature-title">Resume Analyzer</h3>
+        <p class="feature-desc">Get AI-powered feedback on your resume with detailed ATS score, keyword analysis, and improvement tips.</p>
+        <div class="feature-tags">
+          <span class="feature-tag">ATS Score</span>
+          <span class="feature-tag">AI Feedback</span>
+          <span class="feature-tag">Instant Results</span>
+        </div>
+        <button class="feature-cta" onclick="openResumeAnalyzer()">
+          🔍 Analyze Now <i class="cta-arrow">→</i>
+        </button>
+      </div>
+
+      <!-- Interview Preparation -->
+      <div class="feature-card interview" onclick="openInterviewPrep()">
+        <div class="feature-icon">💼</div>
+        <h3 class="feature-title">Interview Preparation</h3>
+        <p class="feature-desc">Practice with AI-generated interview questions tailored to your role and get expert tips to ace your interviews.</p>
+        <div class="feature-tags">
+          <span class="feature-tag">AI Questions</span>
+          <span class="feature-tag">Mock Interviews</span>
+          <span class="feature-tag">Expert Tips</span>
+        </div>
+        <button class="feature-cta" onclick="openInterviewPrep()">
+          💼 Start Practising <i class="cta-arrow">→</i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- STATS SECTION -->
+    <div class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value">98%</div>
+          <div class="stat-label">ATS Pass Rate</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">15k+</div>
+          <div class="stat-label">Resumes Created</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">3x</div>
+          <div class="stat-label">More Interviews</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">500+</div>
+          <div class="stat-label">Practice Questions</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p class="footer-text">© 2024 ResumeAI. Empowering careers with AI technology.</p>
+    <div class="footer-links">
+      <a href="#" class="footer-link">About Us</a>
+      <a href="#" class="footer-link">Privacy Policy</a>
+      <a href="#" class="footer-link">Terms of Service</a>
+      <a href="#" class="footer-link">Contact</a>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <span class="toast-icon" id="toast-icon"></span>
+    <span id="toast-msg">Message</span>
+  </div>
+
+  <script>
+    // ── SESSION GUARD: redirect to login if not logged in ──
+    if (localStorage.getItem('resumeai_loggedin') !== 'true') {
+      window.location.href = 'resume-signin.html';
+    }
+
+    // ── SHOW LOGGED-IN USER NAME ──
+    window.addEventListener('DOMContentLoaded', () => {
+      const userStr = localStorage.getItem('resumeai_current_user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        const firstName = user.name.split(' ')[0];
+        const initial = user.name.charAt(0).toUpperCase();
+
+        // Update avatar initial and name in topbar
+        const avatar = document.querySelector('.user-avatar');
+        const userName = document.querySelector('.user-name');
+        if (avatar) avatar.textContent = initial;
+        if (userName) userName.textContent = firstName;
+
+        // Update hero welcome text
+        const welcomeTag = document.querySelector('.welcome-tag');
+        if (welcomeTag) welcomeTag.textContent = `👋 Welcome Back, ${firstName}!`;
+      }
+
+      setTimeout(() => {
+        showToast('🎉', 'Welcome to ResumeAI Dashboard!');
+      }, 500);
+    });
+
+    // ── OPEN RESUME BUILDER ──
+    function openResumeBuilder() {
+      showToast('📝', 'Opening Resume Builder...');
+      setTimeout(() => {
+        window.location.href = 'resumebuilder.html';
+      }, 500);
+    }
+
+    // ── OPEN RESUME ANALYZER ──
+    function openResumeAnalyzer() {
+      showToast('🔍', 'Opening Resume Analyzer...');
+      setTimeout(() => {
+        window.location.href = 'resumeanalyzer.html';
+      }, 500);
+    }
+
+    // ── OPEN INTERVIEW PREPARATION ──
+    function openInterviewPrep() {
+      showToast('💼', 'Opening Interview Preparation...');
+      setTimeout(() => {
+        window.location.href = 'interview.html';
+      }, 500);
+    }
+
+    // ── LOGOUT: clear session then redirect ──
+    function logout() {
+      showToast('👋', 'Logging out...');
+      setTimeout(() => {
+        localStorage.removeItem('resumeai_loggedin');
+        localStorage.removeItem('resumeai_current_user');
+        window.location.href = 'resume-signin.html';
+      }, 1000);
+    }
+
+    // ── TOAST NOTIFICATION ──
+    function showToast(icon, msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-icon').textContent = icon;
+      document.getElementById('toast-msg').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Interview Coach</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#f8fafc;--surface:#fff;--card:#f1f5f9;
+      --border:rgba(148,163,184,.25);--accent:#10b981;--accent2:#3b82f6;
+      --accent3:#6366f1;--text:#0f172a;--muted:#64748b;--light:#94a3b8;
+    }
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+    .topbar{background:linear-gradient(135deg,#0f172a,#1e3a5f);padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(15,23,42,.15)}
+    .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#fff}
+    .logo span{color:#7ecba1}
+    .topbar-right{display:flex;align-items:center;gap:14px}
+    .topbar-user{color:rgba(255,255,255,.7);font-size:.85rem}
+    .btn-topbar{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);padding:7px 16px;border-radius:8px;cursor:pointer;font-size:.85rem;font-family:'DM Sans',sans-serif;transition:all .2s}
+    .btn-topbar:hover{background:rgba(255,255,255,.25)}
+    .page{max-width:960px;margin:36px auto 60px;padding:0 24px}
+    .hero{text-align:center;margin-bottom:28px}
+    .hero-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#047857;font-size:.72rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:6px 14px;border-radius:100px;margin-bottom:14px}
+    .hero-tag::before{content:'●';font-size:8px;animation:pulse 1.5s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+    .hero-title{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
+    .hero-title span{color:var(--accent)}
+    .hero-desc{color:var(--muted);font-size:.93rem}
+    .card{background:var(--surface);border-radius:20px;border:1px solid var(--border);box-shadow:0 8px 32px rgba(15,23,42,.08);overflow:hidden}
+    .card-head{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:22px 32px;text-align:center}
+    .card-head h2{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:3px}
+    .card-head p{font-size:.88rem;opacity:.9}
+    .steps{display:flex;border-bottom:1px solid var(--border);background:var(--card)}
+    .step{flex:1;padding:12px 8px;text-align:center;font-size:.75rem;font-weight:600;color:var(--light);display:flex;align-items:center;justify-content:center;gap:6px;border-bottom:3px solid transparent;transition:all .2s}
+    .step.active{color:var(--accent);border-bottom-color:var(--accent)}
+    .step.done{color:var(--accent2);border-bottom-color:var(--accent2)}
+    .step-n{width:20px;height:20px;border-radius:50%;background:var(--border);color:var(--light);font-size:.7rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .step.active .step-n{background:var(--accent);color:#fff}
+    .step.done .step-n{background:var(--accent2);color:#fff}
+    .panel{display:none;animation:fadeUp .3s ease}
+    .panel.show{display:block}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .p1{padding:32px}
+    .field-label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px;display:block}
+    .upload-zone{border:2px dashed rgba(16,185,129,.35);border-radius:14px;padding:32px;text-align:center;background:var(--surface);transition:all .3s;cursor:pointer}
+    .upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(16,185,129,.03)}
+    .upload-zone input[type="file"]{display:none}
+    .upload-icon{font-size:44px;margin-bottom:10px;display:block}
+    .upload-desc{color:var(--muted);font-size:.93rem;margin-bottom:14px;line-height:1.5}
+    .file-picked{margin-top:12px;color:var(--accent);font-weight:600;font-size:.85rem}
+    .prog-bar{display:none;margin-top:16px;background:var(--card);border-radius:8px;height:6px;overflow:hidden}
+    .prog-bar.on{display:block}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));animation:fill 2s ease-in-out forwards}
+    @keyframes fill{from{width:0}to{width:100%}}
+    .btn-main{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:12px 28px;border-radius:25px;cursor:pointer;font-size:.92rem;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .25s;width:100%;justify-content:center;margin-top:20px}
+    .btn-main:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(16,185,129,.35)}
+    .btn-main:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+    .p2{padding:32px}
+    .p2-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:6px}
+    .p2-sub{color:var(--muted);font-size:.88rem;margin-bottom:24px}
+    .chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+    .chip{padding:9px 18px;border:2px solid var(--border);border-radius:30px;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;background:var(--surface);color:var(--text);user-select:none}
+    .chip:hover{border-color:var(--accent);color:var(--accent)}
+    .chip.on{background:linear-gradient(135deg,var(--accent),#059669);border-color:transparent;color:#fff;box-shadow:0 3px 10px rgba(16,185,129,.35)}
+    .sel-info{font-size:.82rem;color:var(--muted);margin-bottom:18px}
+    .sel-info strong{color:var(--accent)}
+    .btn-go{display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--accent3),#4338ca);color:#fff;border:none;padding:13px 32px;border-radius:12px;cursor:pointer;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;transition:all .25s;width:100%}
+    .btn-go:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(99,102,241,.4)}
+    .btn-go:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+    .chat-topbar{padding:12px 20px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+    .active-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#047857;padding:5px 14px;border-radius:20px;font-size:.8rem;font-weight:700}
+    .switcher-wrap{flex:1;min-width:0}
+    .switcher-label{font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px}
+    .switcher{display:flex;gap:6px;flex-wrap:wrap}
+    .sw-btn{padding:6px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:.78rem;font-weight:600;background:var(--surface);color:var(--muted);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+    .sw-btn:hover{border-color:var(--accent2);color:var(--accent2);background:rgba(59,130,246,.06)}
+    .sw-btn.cur{background:var(--accent2);border-color:var(--accent2);color:#fff;box-shadow:0 2px 8px rgba(59,130,246,.35)}
+    .chat{height:460px;overflow-y:auto;padding:24px 28px;background:var(--bg)}
+    .chat::-webkit-scrollbar{width:5px}
+    .chat::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+    .msg{margin-bottom:18px;animation:fadeUp .3s}
+    .msg.bot{display:flex;gap:10px}
+    .msg.usr{display:flex;justify-content:flex-end;gap:10px}
+    .av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.72rem;color:#fff;flex-shrink:0}
+    .av.bot{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+    .av.usr{background:linear-gradient(135deg,#8b5cf6,#ec4899)}
+    .mc{max-width:76%;padding:12px 18px;border-radius:14px;line-height:1.65;font-size:.9rem}
+    .msg.bot .mc{background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:4px;box-shadow:0 2px 8px rgba(15,23,42,.05)}
+    .msg.usr .mc{background:linear-gradient(135deg,var(--accent2),#1d4ed8);color:#fff;border-bottom-right-radius:4px}
+    .q-badge{display:inline-block;font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+    .ans-box{background:rgba(16,185,129,.07);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:10px 14px;margin-top:6px;line-height:1.7;font-size:.88rem}
+    .act-btns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    .act-btn{background:var(--surface);border:1.5px solid var(--border);color:var(--text);padding:6px 14px;border-radius:20px;cursor:pointer;font-size:.8rem;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .2s}
+    .act-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .act-btn.red{border-color:#ef4444;color:#ef4444}
+    .act-btn.red:hover{background:#ef4444;color:#fff;border-color:#ef4444}
+    .input-row{padding:14px 24px;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:10px}
+    .msg-input{flex:1;padding:11px 18px;border:1.5px solid var(--border);border-radius:25px;font-size:.9rem;font-family:'DM Sans',sans-serif;outline:none;color:var(--text);background:var(--surface);transition:border-color .2s}
+    .msg-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(16,185,129,.1)}
+    .btn-send{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;padding:11px 26px;border-radius:25px;cursor:pointer;font-size:.9rem;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .2s}
+    .btn-send:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(16,185,129,.35)}
+    .btn-send:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+    .stats-row{padding:16px 24px;background:var(--card);border-top:1px solid var(--border);display:flex;gap:24px;flex-wrap:wrap}
+    .stat{text-align:center;flex:1;min-width:70px}
+    .sv{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--accent)}
+    .sl{font-size:.72rem;color:var(--muted);margin-top:2px}
+    .dots{display:flex;gap:5px;padding:4px 2px}
+    .dot{width:7px;height:7px;background:var(--accent);border-radius:50%;animation:bo 1.4s infinite}
+    .dot:nth-child(2){animation-delay:.2s}.dot:nth-child(3){animation-delay:.4s}
+    @keyframes bo{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)}}
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,.12);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:12px;font-size:.88rem;opacity:0;transform:translateY(20px);transition:all .3s;z-index:999;pointer-events:none}
+    .toast.show{opacity:1;transform:translateY(0)}
+    @media(max-width:600px){
+      .page{padding:0 12px;margin:20px auto}
+      .hero-title{font-size:1.6rem}
+      .p1,.p2{padding:20px}
+      .chat{height:360px;padding:16px}
+      .chat-topbar{flex-direction:column}
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Resume<span>AI</span></div>
+  <div class="topbar-right">
+    <span class="topbar-user" id="uname"></span>
+    <button class="btn-topbar" onclick="location.href='dashboard.html'">🏠 Dashboard</button>
+  </div>
+</div>
+
+<div class="page">
+  <div class="hero">
+    <div class="hero-tag">Smart Interview Practice</div>
+    <h1 class="hero-title">Interview <span>Preparation</span></h1>
+
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>🤖 AI Interview Coach</h2>
+
+    </div>
+
+    <div class="steps">
+      <div class="step active" id="st1"><div class="step-n">1</div>Upload Resume</div>
+      <div class="step" id="st2"><div class="step-n">2</div>Choose Skills</div>
+      <div class="step" id="st3"><div class="step-n">3</div>Practice</div>
+    </div>
+
+    <!-- PANEL 1 -->
+    <div class="panel show" id="pn1">
+      <div class="p1">
+        <label class="field-label">📄 Upload Your Resume (PDF)</label>
+        <div class="upload-zone" id="dropZone">
+          <label for="pdfFile" style="cursor:pointer;display:block">
+            <span class="upload-icon">📄</span>
+            <div class="upload-desc"><strong>Click to upload</strong> or drag &amp; drop your resume<br><span style="font-size:.82rem">PDF format · Skills auto-detected from your resume text</span></div>
+            <input type="file" id="pdfFile" accept=".pdf"/>
+          </label>
+          <div class="file-picked" id="fpick"></div>
+          <div class="prog-bar" id="pbar"><div class="prog-fill"></div></div>
+        </div>
+        <button class="btn-main" id="analyzeBtn" disabled onclick="doAnalyse()">🔍 Detect Skills from Resume</button>
+      </div>
+    </div>
+
+    <!-- PANEL 2 -->
+    <div class="panel" id="pn2">
+      <div class="p2">
+        <div class="p2-title">🎯 Select Skills to Practise</div>
+        <div class="p2-sub">Skills detected from your resume are highlighted. Select one or more to start your interview session.</div>
+        <div class="chips" id="chipBox"></div>
+        <div class="sel-info" id="selInfo">No skills selected yet.</div>
+        <button class="btn-go" id="goBtn" disabled onclick="startSession()">🎤 Start Interview Practice →</button>
+      </div>
+    </div>
+
+    <!-- PANEL 3 -->
+    <div class="panel" id="pn3">
+      <div class="chat-topbar">
+        <div>
+          <span style="font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Current Skill</span><br>
+          <span class="active-badge" id="curBadge">—</span>
+        </div>
+        <div class="switcher-wrap">
+          <span class="switcher-label">Switch Skill</span>
+          <div class="switcher" id="switcher"></div>
+        </div>
+      </div>
+
+      <div class="chat" id="chatBox"></div>
+
+      <div class="input-row">
+        <input type="text" class="msg-input" id="msgIn" placeholder='Type your answer… or type "stop" to stop this skill' disabled/>
+        <button class="btn-send" id="sndBtn" disabled>Send</button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat"><div class="sv" id="stQ">0</div><div class="sl">Questions</div></div>
+        <div class="stat"><div class="sv" id="stA">0</div><div class="sl">Answers</div></div>
+        <div class="stat"><div class="sv" id="stT">0:00</div><div class="sl">Time</div></div>
+        <div class="stat"><div class="sv" id="stSk" style="font-size:.85rem">—</div><div class="sl">Active Skill</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="tIcon"></span><span id="tMsg"></span></div>
+
+<script src="interview_questions.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// ── SESSION GUARD (checks sessionStorage + 8hr expiry) ──
+(function() {
+  const SESSION_MS = 8 * 60 * 60 * 1000;
+  const loggedIn   = sessionStorage.getItem('resumeai_loggedin') === 'true';
+  let expired      = true;
+  try {
+    const s = JSON.parse(sessionStorage.getItem('resumeai_session') || '{}');
+    expired = !s.loginTime || (Date.now() - s.loginTime) > SESSION_MS;
+  } catch(e) {}
+  if (!loggedIn || expired) {
+    sessionStorage.clear();
+    localStorage.removeItem('resumeai_loggedin');
+    localStorage.removeItem('resumeai_current_user');
+    location.href = 'resume-signin.html';
+  }
+})();
+const _su=localStorage.getItem('resumeai_current_user');
+if(_su){try{const u=JSON.parse(_su);const e=document.getElementById('uname');if(e)e.textContent='👤 '+u.name.split(' ')[0];}catch(e){}}
+
+// ═══════════════════════════════════════════════════
+//  THE 20 TARGET SKILLS — keywords for PDF detection
+// ═══════════════════════════════════════════════════
+const SKILL_LIST = [
+  "C","C++","Python","Java","SQL","Power BI",
+  "Machine Learning","Artificial Intelligence",
+  "HTML","CSS","JavaScript","React JS",
+  "Node JS","AWS","Git","Django","Flask",
+  "Data Structures and Algorithms","PHP","R"
+];
+
+const SKD = {
+  "C":          [" c ", "c programming", "c language", "c code", " c,", " c\n"],
+  "C++":        ["c++","cpp","c plus plus"],
+  "Python":     ["python"],
+  "Java":       ["java"],
+  "SQL":        ["sql","mysql","postgresql","sqlite","oracle db","structured query"],
+  "Power BI":   ["power bi","powerbi"],
+  "Machine Learning": ["machine learning"," ml ","supervised learning","unsupervised"],
+  "Artificial Intelligence": ["artificial intelligence"," ai ","deep learning","neural network","nlp","natural language"],
+  "HTML":       ["html"],
+  "CSS":        ["css"],
+  "JavaScript": ["javascript"," js ","js,","es6","ecmascript"],
+  "React JS":   ["react","reactjs","react.js","react js"],
+  "Node JS":    ["node.js","nodejs","node js","expressjs","express.js"],
+  "AWS":        ["aws","amazon web services","ec2","s3 bucket","lambda"],
+  "Git":        [" git ","github","gitlab","bitbucket","version control"],
+  "Django":     ["django"],
+  "Flask":      ["flask"],
+  "Data Structures and Algorithms": ["data structures","dsa","algorithms","linked list","binary tree","sorting","graph"],
+  "PHP":        ["php","laravel","codeigniter"],
+  "R":          [" r ","r programming","r language","ggplot","dplyr","tidyverse"],
+};
+
+const ICONS = {
+  "C":"💻","C++":"⚙️","Python":"🐍","Java":"☕","SQL":"🗃️","Power BI":"📊",
+  "Machine Learning":"🤖","Artificial Intelligence":"🧠",
+  "HTML":"🌐","CSS":"🎨","JavaScript":"🟨","React JS":"⚛️",
+  "Node JS":"🟩","AWS":"☁️","Git":"🐙","Django":"🎸","Flask":"🧪",
+  "Data Structures and Algorithms":"🌳","PHP":"🐘","R":"📈"
+};
+
+
+// ═══════════════════════════════════════════════════
+//  SMART QUESTION ENGINE
+// ═══════════════════════════════════════════════════
+const usedIdx = {};
+
+function getNextQ(skill) {
+  const bank = QB[skill];
+  if (!bank || !bank.length) return null;
+  if (!usedIdx[skill]) usedIdx[skill] = new Set();
+  const used = usedIdx[skill];
+  if (used.size >= bank.length) used.clear();
+  let idx;
+  let tries = 0;
+  do { idx = Math.floor(Math.random() * bank.length); tries++; }
+  while (used.has(idx) && tries < bank.length * 3);
+  used.add(idx);
+  return { ...bank[idx], skill };
+}
+
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let detected = [], selected = [], curSkill = '';
+let qCount = 0, aCount = 0, timer = null, tStart = null;
+let currentQ = null, waiting = false;
+let sessionId = 0; // INCREMENT on every skill switch — guards async delays
+
+// ═══════════════════════════════════════════════════
+//  UPLOAD
+// ═══════════════════════════════════════════════════
+document.getElementById('pdfFile').addEventListener('change', e => {
+  const f = e.target.files[0]; if (!f) return;
+  document.getElementById('fpick').textContent = `✓ ${f.name}  (${(f.size/1024).toFixed(1)} KB)`;
+  document.getElementById('analyzeBtn').disabled = false;
+});
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag'); });
+dz.addEventListener('dragleave', () => dz.classList.remove('drag'));
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if (f && f.name.endsWith('.pdf')) {
+    document.getElementById('pdfFile').files = e.dataTransfer.files;
+    document.getElementById('fpick').textContent = `✓ ${f.name}`;
+    document.getElementById('analyzeBtn').disabled = false;
+  }
+});
+
+// ═══════════════════════════════════════════════════
+//  ANALYSE — detect skills from PDF
+// ═══════════════════════════════════════════════════
+async function doAnalyse() {
+  const file = document.getElementById('pdfFile').files[0];
+  if (!file) { toast('⚠️', 'Upload a PDF resume first.'); return; }
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById('pbar').classList.add('on');
+
+  try {
+    const ab = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
+    let txt = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const pg = await pdf.getPage(i);
+      const ct = await pg.getTextContent();
+      txt += ct.items.map(x => x.str).join(' ') + ' ';
+    }
+    const low = txt.toLowerCase();
+    detected = [];
+    for (const sk of SKILL_LIST) {
+      const kws = SKD[sk] || [];
+      if (kws.some(k => low.includes(k))) detected.push(sk);
+    }
+    document.getElementById('pbar').classList.remove('on');
+
+    if (detected.length === 0) {
+      // If no skills detected from PDF, show ALL skills for manual selection
+      detected = [...SKILL_LIST];
+      buildChips(true);
+      goStep(2);
+      toast('💡', 'Skills not detected automatically. Please select manually.');
+    } else {
+      buildChips(false);
+      goStep(2);
+      toast('✅', `${detected.length} skills detected from your resume!`);
+    }
+  } catch (err) {
+    document.getElementById('pbar').classList.remove('on');
+    document.getElementById('analyzeBtn').disabled = false;
+    toast('❌', 'PDF error: ' + err.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  SKILL CHIPS
+// ═══════════════════════════════════════════════════
+function buildChips(showAll) {
+  // Always show ALL 20 skills; highlight detected ones
+  const box = document.getElementById('chipBox');
+  box.innerHTML = '';
+  const toShow = showAll ? SKILL_LIST : SKILL_LIST; // always show all 20
+  toShow.forEach(sk => {
+    const c = document.createElement('div');
+    c.className = 'chip' + (detected.includes(sk) && !showAll ? ' on' : '');
+    c.dataset.sk = sk;
+    c.innerHTML = `${ICONS[sk] || '💡'} ${sk}`;
+    if (detected.includes(sk) && !showAll) selected.push(sk);
+    c.onclick = () => {
+      if (c.classList.contains('on')) {
+        c.classList.remove('on');
+        selected = selected.filter(s => s !== sk);
+      } else {
+        c.classList.add('on');
+        if (!selected.includes(sk)) selected.push(sk);
+      }
+      updSel();
+    };
+    box.appendChild(c);
+  });
+  updSel();
+}
+
+function updSel() {
+  const si = document.getElementById('selInfo'), gb = document.getElementById('goBtn');
+  if (!selected.length) {
+    si.innerHTML = 'No skills selected yet. Click the skills you want to practise.';
+    gb.disabled = true;
+  } else {
+    si.innerHTML = `<strong>${selected.length}</strong> skill${selected.length > 1 ? 's' : ''} selected: <em>${selected.join(', ')}</em>`;
+    gb.disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  START SESSION
+// ═══════════════════════════════════════════════════
+function startSession() {
+  goStep(3);
+  curSkill = selected[0];
+  buildSwitcher();
+  setBadge(curSkill);
+  hlSwitcher(curSkill);
+
+  document.getElementById('msgIn').disabled = false;
+  document.getElementById('sndBtn').disabled = false;
+
+  tStart = Date.now();
+  timer = setInterval(() => {
+    const s = Math.floor((Date.now() - tStart) / 1000);
+    document.getElementById('stT').textContent = `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+  }, 1000);
+
+  bot(`👋 <strong>Welcome to your Interview Practice Session!</strong><br><br>
+Starting with <strong>${ICONS[curSkill] || '💡'} ${curSkill}</strong> — fresher-level questions.<br><br>
+📌 <strong>How it works:</strong><br>
+• I ask one question at a time → you type your answer → I show the model answer<br>
+• Questions keep coming <strong>until you type "stop"</strong> or click 🛑 Stop<br>
+• Use the <em>Switch Skill</em> buttons above to change topics anytime<br><br>
+Ready? Here's your first question! 💪`);
+
+  sessionId++;
+  const mySession = sessionId;
+  setTimeout(() => { if (sessionId === mySession) askQ(); }, 900);
+}
+
+// ═══════════════════════════════════════════════════
+//  ASK QUESTION
+// ═══════════════════════════════════════════════════
+function askQ() {
+  const mySession = sessionId; // capture current session
+
+  const q = getNextQ(curSkill);
+  if (!q) { bot(`⚠️ No questions found for <strong>${curSkill}</strong>.`); return; }
+
+  currentQ = q;
+  qCount++;
+  document.getElementById('stQ').textContent = qCount;
+  waiting = true;
+
+  showDots();
+  setTimeout(() => {
+    if (sessionId !== mySession) return; // skill switched — abort
+    hideDots();
+    bot(`<span class="q-badge">❓ Q${qCount} · ${curSkill}</span><br>${q.q}`);
+    setTimeout(() => {
+      if (sessionId !== mySession) return;
+      const last = document.getElementById('chatBox').lastElementChild;
+      if (last) last.querySelector('.mc').insertAdjacentHTML('beforeend',
+        `<div class="act-btns"><button class="act-btn red" onclick="doStop()">🛑 Stop Questions</button></div>`);
+    }, 200);
+  }, 600);
+}
+
+// ═══════════════════════════════════════════════════
+//  SEND ANSWER
+// ═══════════════════════════════════════════════════
+document.getElementById('sndBtn').addEventListener('click', sendAns);
+document.getElementById('msgIn').addEventListener('keypress', e => { if (e.key === 'Enter') sendAns(); });
+
+function sendAns() {
+  const txt = document.getElementById('msgIn').value.trim();
+  if (!txt) return;
+  document.getElementById('msgIn').value = '';
+
+  if (/^stop\b/i.test(txt)) { usr(txt); doStop(); return; }
+
+  if (!waiting) { usr(txt); return; }
+
+  usr(txt);
+  waiting = false;
+  aCount++;
+  document.getElementById('stA').textContent = aCount;
+
+  const q = currentQ;
+  const mySession = sessionId;
+  showDots();
+  setTimeout(() => {
+    if (sessionId !== mySession) return;
+    hideDots();
+    bot(`<div style="margin-bottom:8px">💬 <strong>Good attempt! Here is the model answer:</strong></div>
+<div class="ans-box">${q.a}</div>`);
+    setTimeout(() => {
+      if (sessionId !== mySession) return;
+      const last = document.getElementById('chatBox').lastElementChild;
+      if (last) last.querySelector('.mc').insertAdjacentHTML('beforeend',
+        `<div class="act-btns">
+          <button class="act-btn" onclick="askQ()">➡️ Next Question</button>
+          <button class="act-btn red" onclick="doStop()">🛑 Stop</button>
+        </div>`);
+    }, 200);
+  }, 700);
+}
+
+// ═══════════════════════════════════════════════════
+//  SWITCH SKILL — FIXED with sessionId guard
+// ═══════════════════════════════════════════════════
+function buildSwitcher() {
+  const sw = document.getElementById('switcher');
+  sw.innerHTML = '';
+  selected.forEach(sk => {
+    const b = document.createElement('button');
+    b.className = 'sw-btn';
+    b.id = 'sw_' + sk.replace(/\W/g, '_');
+    b.innerHTML = `${ICONS[sk] || '💡'} ${sk}`;
+    b.onclick = () => switchTo(sk);
+    sw.appendChild(b);
+  });
+}
+
+function hlSwitcher(sk) {
+  selected.forEach(s => {
+    const b = document.getElementById('sw_' + s.replace(/\W/g, '_'));
+    if (b) b.classList.toggle('cur', s === sk);
+  });
+}
+
+function setBadge(sk) {
+  document.getElementById('curBadge').textContent = (ICONS[sk] || '💡') + ' ' + sk;
+  document.getElementById('stSk').textContent = sk;
+}
+
+function switchTo(sk) {
+  if (sk === curSkill) return;
+
+  // Update state FIRST before anything async
+  curSkill = sk;
+  waiting = false;
+  currentQ = null;
+  sessionId++; // INVALIDATE any pending setTimeout callbacks from old skill
+  const mySession = sessionId;
+
+  hlSwitcher(sk);
+  setBadge(sk);
+  hideDots(); // remove any lingering typing indicator
+
+  // Re-enable input in case it was disabled
+  document.getElementById('msgIn').disabled = false;
+  document.getElementById('sndBtn').disabled = false;
+
+  bot(`🔄 Switched to <strong>${ICONS[sk] || '💡'} ${sk}</strong>! Here comes your next question:`);
+
+  setTimeout(() => {
+    if (sessionId !== mySession) return;
+    askQ();
+  }, 500);
+}
+
+// ═══════════════════════════════════════════════════
+//  STOP + END
+// ═══════════════════════════════════════════════════
+function doStop() {
+  waiting = false;
+  hideDots();
+  const others = selected.filter(s => s !== curSkill);
+  let html = `🛑 <strong>Stopped ${curSkill} questions.</strong><br>
+You answered <strong>${aCount}</strong> question${aCount !== 1 ? 's' : ''} in this session. Great practice! 💪`;
+
+  if (others.length > 0) {
+    html += `<br><br>Continue with another skill or end:`;
+    const btns = others.map(s =>
+      `<button class="act-btn" onclick="switchTo('${s.replace(/'/g,"\\'")}')">` +
+      `${ICONS[s] || '💡'} ${s}</button>`
+    ).join('');
+    html += `<div class="act-btns">${btns}<button class="act-btn red" onclick="endSession()">🏁 End Session</button></div>`;
+  } else {
+    html += `<div class="act-btns">
+      <button class="act-btn red" onclick="endSession()">🏁 End Session</button>
+      <button class="act-btn" onclick="location.reload()">🔄 New Session</button>
+    </div>`;
+  }
+  bot(html);
+  document.getElementById('msgIn').disabled = true;
+  document.getElementById('sndBtn').disabled = true;
+}
+
+function endSession() {
+  clearInterval(timer);
+  document.getElementById('msgIn').disabled = true;
+  document.getElementById('sndBtn').disabled = true;
+  bot(`🏁 <strong>Session Complete!</strong><br><br>
+📊 Questions: <strong>${qCount}</strong> &nbsp;|&nbsp; ✅ Answers: <strong>${aCount}</strong><br><br>
+Keep practising daily — consistency is the key to cracking fresher interviews! 🚀<br><br>
+<div class="act-btns"><button class="act-btn" onclick="location.reload()">🔄 Start New Session</button></div>`);
+}
+
+// ═══════════════════════════════════════════════════
+//  STEP NAV
+// ═══════════════════════════════════════════════════
+function goStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById(`pn${i}`).classList.toggle('show', i === n);
+    const s = document.getElementById(`st${i}`);
+    s.classList.remove('active', 'done');
+    if (i === n) s.classList.add('active'); else if (i < n) s.classList.add('done');
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  CHAT HELPERS
+// ═══════════════════════════════════════════════════
+function bot(html) {
+  const d = document.createElement('div'); d.className = 'msg bot';
+  d.innerHTML = `<div class="av bot">AI</div><div class="mc">${html}</div>`;
+  const c = document.getElementById('chatBox'); c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function usr(t) {
+  const d = document.createElement('div'); d.className = 'msg usr';
+  d.innerHTML = `<div class="mc">${t}</div><div class="av usr">You</div>`;
+  const c = document.getElementById('chatBox'); c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function showDots() {
+  if (document.getElementById('dots')) return;
+  const d = document.createElement('div'); d.className = 'msg bot'; d.id = 'dots';
+  d.innerHTML = `<div class="av bot">AI</div><div class="mc"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div></div>`;
+  const c = document.getElementById('chatBox'); c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function hideDots() { const e = document.getElementById('dots'); if (e) e.remove(); }
+
+function toast(icon, msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('tIcon').textContent = icon + ' ';
+  document.getElementById('tMsg').textContent = msg;
+  t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>
